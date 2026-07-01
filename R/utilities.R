@@ -2,6 +2,47 @@
 # General helper functions
 #-------------------------------------------------------------------------------
 
+# Draw random samples from posterior distribution of growth curve parameters
+# from a 3d array (groupings present) or matrix (no groupings). Returns a list
+# of growth parameter data.frames (col = parameter, row = groups). Each
+# data.frame is a random draw from posterior distribution
+
+.post_draw <- function (model.out,n.sim){
+
+  # For outputs without group specific parameters (matrix),
+  # each row is a posterior draw
+  if(is.na(dim(model.out)[3])){
+
+    # How many iterations?
+    n.iter = nrow(model.out)
+
+    # Random draws
+    s <- sample(1:n.iter,n.sim,replace = T)
+
+    # Create a list of random draws of growth parameters
+    mod_list <- lapply(s,function(x) as.data.frame(model.out[x,]))
+  } else {
+
+    # For outputs with group specific parameters (arrays),
+    # each slice is a posterior draw
+
+    # How many iterations?
+    n.iter = dim(model.out)[3]
+
+    # Random draws
+    s <- sample(1:n.iter,n.sim,replace = T)
+
+    # Create a list of random draws of growth parameters
+    mod_list <- lapply(s, function(x) {
+      as.data.frame(matrix(
+        model.out[ , , x],
+        nrow = dim(model.out)[1],
+        dimnames = dimnames(model.out)[1:2]
+      ))
+    })
+  }
+  mod_list
+}
 
 # Summarize data in arrays created in bootstrapping or posterior distribution
 # sampling. Returns data.frame containing group specific mean or median values
