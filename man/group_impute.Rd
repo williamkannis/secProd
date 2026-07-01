@@ -4,7 +4,7 @@
 \alias{group_impute}
 \title{Randomly impute missing values within groupings}
 \usage{
-group_impute(data, column, by, limit, impute.tag = "imputed")
+group_impute(data, column, by, limit = 1, impute.tag = "imputed")
 }
 \arguments{
 \item{data}{data.frame containing missing data.}
@@ -14,7 +14,7 @@ group_impute(data, column, by, limit, impute.tag = "imputed")
 \item{by}{name of columns used to define group.}
 
 \item{limit}{minimum number of non-NA values within a group required to
-impute data}
+impute data. Defualt is 1}
 
 \item{impute.tag}{numeric or character value to designate rows where data
 were imputed.}
@@ -27,4 +27,16 @@ input data.frame with missing values imputed. Additional column
 Impute missing values by taking random sample within user defined groupings.
 Data is only imputed if group has a sufficncent sample size defined by the
 user.
+}
+\examples{
+# generate data.frame with missing data
+df <- data.frame(site = rep(c(1,2),each = 5),length= runif(10,5,40))
+df$length[sample(1:nrow(df),3)] <- NA
+df
+
+# Impute data by site
+group_impute(df,length,site)
+
+
+
 }

@@ -9,34 +9,43 @@
 #' @param column name of column with missing data.
 #' @param by name of columns used to define group.
 #' @param limit minimum number of non-NA values within a group required to
-#' impute data
+#' impute data. Defualt is 1
 #' @param impute.tag numeric or character value to designate rows where data
 #' were imputed.
 #'
 #' @returns input data.frame with missing values imputed. Additional column
 #' 'impute' with user specified tag to designate rows where data were imputed.
 #'
+#' @examples
+#' # generate data.frame with missing data
+#' df <- data.frame(site = rep(c(1,2),each = 5),length= runif(10,5,40))
+#' df$length[sample(1:nrow(df),3)] <- NA
+#' df
+#'
+#' # Impute data by site
+#' group_impute(df,length,site)
+#'
 #' @export
 
-
-group_impute <- function(data, column, by, limit, impute.tag = "imputed"){
+group_impute <- function(data, column, by, limit = 1, impute.tag = "imputed"){
 
   # Are columns present in data?
   tidyselect::eval_select(rlang::enquo(column), data)
   tidyselect::eval_select(rlang::enquo(by), data)
 
   # is limit numeric?
-  stopifnot('Please provide "limit" as numeric value'=is.numeric(limit))
+  stopifnot('Please provide "limit" as an interger greater than zero'=
+              is.numeric(limit) & limit > 0)
 
   # are missing values present?
-  miss_data <- data %>% pull({{ column }})
+  miss_data <- data %>% dplyr::pull({{ column }})
   if(!any(is.na(miss_data))) {
-    return(data)
     warning(paste0(
       "No missing values present in indicated column. Returning identical ",
       "data.frame"
     )
   )
+    return(data)
   }
 
   # impute data based data availability
