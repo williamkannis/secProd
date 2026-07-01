@@ -15,7 +15,7 @@
 sample_interval <- function(df){
   df %>%
     # dplyr::distinct(dplyr::all_of(sample.groups,"date"))
-    distinct(cum,site,date) %>%
+    distinct(cum,site,group_id,date) %>%
     group_by(site) %>%
 
     # Estimate sampling intervals
