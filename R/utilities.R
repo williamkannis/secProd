@@ -44,50 +44,60 @@
   mod_list
 }
 
-# Summarize data in arrays created in bootstrapping or posterior distribution
-# sampling. Returns data.frame containing group specific mean or median values
-# with 95% confidence or credible intervals
+#-------------------------------------------------------------------------------
+# Summarize data in lists created in bootstrapping sampling. Returns data.frame
+# containing group specific summary stats including 95% confidence or credible
+# intervals
 
-.boot_summary <- function(array,group.var,sum.fun="mean",ci=c(0.0275,0.975)){
+.boot_summary <- function(
+    boot_list,
+    group.var,
+    ci=c(0.0275,0.975)
+) {
 
-  # Summary function
-  fun <- get(sum.fun)
+  # TEST THAT DATA>FRAMES ARE THE SAME ROWS, COLUMNS, AND GROUPING
 
-  # summary function label
-  fun_label <- paste0("_",sum.fun)
-
-  # Calculate summary statistic and 95 CI interval of estimates
-  summary <- as.data.frame(apply(array,c(1,2), fun))
-  uprs <- as.data.frame(apply(array,c(1,2), quantile, probs=ci[2], na.rm=T))
-  lwrs <- as.data.frame(apply(array,c(1,2), quantile, probs=ci[1], na.rm=T))
-
-  # Merge into one summary table
-  summary %>%
-    dplyr::left_join(
-      lwrs,
-      by=group.var,
-      suffix = c("","_lwr")
-    )  %>%
-    dplyr::left_join(
-      uprs,
-      by=group.var,
-      suffix = c(fun_label,"_upr")
+  # Combine list of boot draws into one data.frame and summarize,
+  dplyr::bind_rows(boot_list) %>%
+    dplyr::group_by(
+      dplyr::across(dplyr::all_of(group.var))
+      ) %>%
+    dplyr::summarize(
+      dplyr::across(
+        .cols = dplyr::everything(),
+        .fns = list(
+          mean = \(x) mean(x, na.rm = TRUE),
+          sd = \(x) sd(x, na.rm = TRUE),
+          med = \(x) median(x, na.rm = TRUE),
+          lwr = \(x) quantile(x,probs=ci[1], na.rm=T),
+          upr = \(x) quantile(x,probs=ci[2], na.rm=T)
+        ),
+        .names = "{.col}_{.fn}"
+      ),
+      .groups = "drop"
     )
 }
 
 
+# ------------------------------------------------------------------------------
 # Summarize non-bootstraped sample density and biomass and data.
 
-.biomass_summary <- function(biomass){
+.biomass_summary <- function(biomass,sample,group.var){
+  df <- biomass %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(group.var))) %>%
+    dplyr::summarise(
+      n = n(),
+      mean_mass = mean(wt,na.rm=T),
+      .groups = "drop"
+    ) %>%
+    dplyr::right_join(sample,by=group.var) %>%
+    dplyr::mutate(
+      sample_den = n/area,
+      sample_biomass = mean_mass*sample_den
+    ) %>%
+    dplyr::select(-n,-mean_mass)
 
-  # Calculate density and biomass of fish at each sample
-  biomass %>%
-    group_by(site,cum) %>%
-    summarise(n = n(),
-              mean_mass = mean(dry_wt,na.rm=T),
-              area = mean(area, na.rm=T)) %>%
-    mutate(sample_den = n/area,
-           sample_biomass = mean_mass*sample_den) %>%
-    select(-mean_mass,-n,-area) %>%
-    ungroup()
+  # assign samples with no fish density and biomass of zero
+  df[is.na(df$sample_den),c("sample_den","sample_biomass")] <- 0
+  df
 }
