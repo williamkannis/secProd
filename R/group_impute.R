@@ -9,7 +9,7 @@
 #' @param column name of column with missing data.
 #' @param by name of columns used to define group.
 #' @param limit minimum number of non-NA values within a group required to
-#' impute data. Defualt is 1
+#' impute data. Default is 1
 #' @param impute.tag numeric or character value to designate rows where data
 #' were imputed.
 #'
