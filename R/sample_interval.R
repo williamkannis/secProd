@@ -15,11 +15,11 @@
 sample_interval <- function(df){
   df %>%
     # dplyr::distinct(dplyr::all_of(sample.groups,"date"))
-    distinct(cum,site,group_id,date) %>%
-    group_by(site) %>%
+    # distinct(cum,site,group_id,date) %>%
+    dplyr::group_by(site) %>%
 
     # Estimate sampling intervals
-    mutate(interval = case_when(
+    dplyr::mutate(interval = dplyr::case_when(
 
       # do not estimate sampling intervals when the next period was not sampled
       cum+1 != lead(cum,order_by = cum) ~ NA,
@@ -27,5 +27,5 @@ sample_interval <- function(df){
     ),
     interval = as.numeric(round(interval))
     ) %>%
-    ungroup()
+    dplyr::ungroup()
 }

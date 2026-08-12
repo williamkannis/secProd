@@ -134,7 +134,7 @@ production <- function(
       replace = T,
       by=c(site,cum)
     )
-    if(growth.boot) arg$growth <- .post_draw(growth_array,1)[[1]]
+    if(growth.boot) arg$growth <- .post_draw(growth,1)[[1]]
 
     # Return production based on specified methodology
     do.call(prod_fun,arg)
