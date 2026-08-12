@@ -70,7 +70,7 @@ group_impute <- function(data, column, by, limit = 1, impute.tag = "imputed"){
   n_real <- sum(!is.na(x))
   if(n_real<=limit) return(x)
 
-  # only NA values should be repaced
+  # only NA values should be replaced
   x[is.na(x)] <- sample(
     x[!is.na(x)],
     sum(is.na(x)),
