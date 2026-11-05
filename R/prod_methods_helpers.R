@@ -5,7 +5,7 @@
 # Instantaneous growth rate method
 .igr <- function(growth,biomass,sample,class.type,class.size) {
 
-  # # Assess input data
+  # # Assess input data MAKE ITS OWN FUNCTION
   # if(c("") %in% names(biomass)){
   #   stop()
   # }
@@ -23,11 +23,11 @@
   biomass_sc <- .class_bio_sum(sample,class_df,biomass)
   growth_sc <- .class_growth_sum(growth,class_df)
 
-  # combine biomass and groth data
+  # combine biomass and growth data
   input <- biomass_sc %>%
     dplyr::left_join(
       growth_sc,
-      by = join_by("class", "group_id", "interval")
+      by = dplyr::join_by("class", "group_id", "interval")
     )
 
   # Estimate class specific igr production
