@@ -2,6 +2,10 @@
 # General production helper functions
 #-------------------------------------------------------------------------------
 
+.check_input_data <- function(df, type = c()) {
+
+}
+
 # Separate data into size or age classes for class specific production estimates
 
 .class_fun <- function(input,class.type,class.size) {
@@ -11,22 +15,27 @@
     stop('class.type must be "age" or "size"')
   }
   if(any(!c("group_id","length") %in% names(input))) {
-    stop('input must contian columns "group_id" and "length"')
+    stop('input must contain columns "group_id" and "length"')
   }
 
-  #  class
-  if(class.type == "age"){
-    class_df <- input %>%
-      dplyr::mutate(class = floor(age_pred/class.size)) %>%
-      dplyr::distinct(group_id,length,class)
-  }
-  if(class.type == "size"){
-    class_df <- input %>%
-      dplyr::mutate(class = floor(length/class.size)) %>%
-      dplyr::distinct(group_id,length,class)
+  if(class.type == "age" && !"age_pred" %in% names(input)) {
+    stop('input must contain column "age_pred"')
   }
 
-  # CHeck that al groups have the same groups
+  if(!(is.numeric(class.size) && class.size > 0 && class.size %% 1 == 0)) {
+    stop("class.size must be postive interger")
+  }
+
+  #  class type
+  if(class.type == "size") input$class_input <- input$length
+  if(class.type == "age") input$class_input <- input$age_pred
+
+  # Create class groupings
+  class_df <- input %>%
+    dplyr::mutate(class = floor(class_input/class.size)) %>%
+    dplyr::distinct(group_id,length,class)
+
+  # Check that all groups have the same groups
   group <- unique(class_df$group_id)
   class_test <-lapply(group, function(x){
     class_df %>%
@@ -63,13 +72,13 @@
       area = mean(area,na.rm=T),
       .groups = "drop"
     ) %>%
-    dplyr::mutate(mean_mass = case_when(
+    dplyr::mutate(mean_mass = dplyr::case_when(
       is.nan(mean_mass) ~ 0,
       T~ mean_mass
     ))
 
   # Not every growth grouping has all age classes, this can lead to NA
-  # production downstream. Add in missing age classes to demostrate no fish of
+  # production downstream. Add in missing age classes to demonstrate no fish of
   # these ages were found
 
   ## THIS WORKS BUT CREATES ADDITIONAL ISSUES. THERE ARE NO GROWTH RATES FOR
