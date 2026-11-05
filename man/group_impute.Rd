@@ -14,7 +14,7 @@ group_impute(data, column, by, limit = 1, impute.tag = "imputed")
 \item{by}{name of columns used to define group.}
 
 \item{limit}{minimum number of non-NA values within a group required to
-impute data. Defualt is 1}
+impute data. Default is 1}
 
 \item{impute.tag}{numeric or character value to designate rows where data
 were imputed.}
@@ -36,7 +36,5 @@ df
 
 # Impute data by site
 group_impute(df,length,site)
-
-
 
 }
