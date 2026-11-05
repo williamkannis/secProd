@@ -112,7 +112,6 @@ production <- function(
     lapply_fun <- lapply
   }
 
-
   # Production estimation inputs
   prod_fun <- get(paste0(".",method))
   if(!boot) iter = 1
