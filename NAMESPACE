@@ -2,7 +2,6 @@
 
 export("%>%")
 export(group_impute)
-export(production_igr)
-export(production_igr_boot)
+export(production)
 export(sample_interval)
 importFrom(magrittr,"%>%")
