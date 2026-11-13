@@ -69,6 +69,17 @@ production <- function(
     stop("Please provide numeric value 'iter' for bootstrapping iterations")
   }
 
+  if(boot && (
+    !is.numeric(iter) ||
+    length(iter) != 1 ||
+    is.na(iter) ||
+    !is.finite(iter) ||
+    iter < 1 ||
+    iter != floor(iter)
+  )) {
+    stop("'iter' must be a positive integer")
+  }
+
   if(!method %in% c("igr") & growth.boot){
     stop(
       paste0('growth.boot can only be TRUE when estimating production with ',
@@ -154,9 +165,9 @@ production <- function(
 
   # Prepare output
   out_summary <- biomass_sum %>%
-    left_join(
+    dplyr::left_join(
       prod,
-      by=join_by(site,cum)
+      by=dplyr::join_by(site,cum)
     )
 
   # with no biomass bootstrapping, the biomass output from production helpers
