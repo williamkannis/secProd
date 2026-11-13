@@ -22,8 +22,8 @@ sample_interval <- function(df){
     dplyr::mutate(interval = dplyr::case_when(
 
       # do not estimate sampling intervals when the next period was not sampled
-      cum+1 != lead(cum,order_by = cum) ~ NA,
-      T~lead(date,order_by = cum)-date
+      cum+1 != dplyr::lead(cum,order_by = cum) ~ NA,
+      T~dplyr::lead(date,order_by = cum)-date
     ),
     interval = as.numeric(round(interval))
     ) %>%
