@@ -5,23 +5,12 @@
 # Instantaneous growth rate method
 .igr <- function(growth,biomass,sample,class.type,class.size) {
 
-  # # Assess input data MAKE ITS OWN FUNCTION
-  # if(c("") %in% names(biomass)){
-  #   stop()
-  # }
-  # if(c("") %in% names(growth)){
-  #   stop()
-  # }
-  # if(c("") %in% names(sample)){
-  #   stop()
-  # }
-
-  #ASSESS DATA OVERLAP
-
   # Summarize biomass and growth at size or age class
   class_df <- .class_fun(growth,class.type,class.size)
   biomass_sc <- .class_bio_sum(sample,class_df,biomass)
   growth_sc <- .class_growth_sum(growth,class_df)
+
+  # ASSES DATA OVERLAP
 
   # combine biomass and growth data
   input <- biomass_sc %>%
