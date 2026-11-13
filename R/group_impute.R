@@ -78,3 +78,7 @@ group_impute <- function(data, column, by, limit = 1, impute.tag = "imputed"){
   )
   x
 }
+
+## ADD FUNCTIONAILTY FOR MEAN
+# IF ADDING THIS WILL HAVE TO UPDATE TESTS
+# x[is.na(x)] <- mean(x, na.rm = T)
