@@ -51,7 +51,7 @@ test_that("production validates method", {
       method = "foo",
       sample = data.frame(),
       biomass = data.frame(),
-      class.type = "size",
+      class.type = "length",
       class.size = 5
     ),
     '"method" must be one of the following: "igr"'
@@ -66,7 +66,7 @@ test_that("production requires growth data for IGR", {
       sample = data.frame(),
       biomass = data.frame(),
       growth = NULL,
-      class.type = "size",
+      class.type = "length",
       class.size = 5
     ),
     "Please provide data.frame or list 'growth'"
@@ -81,7 +81,7 @@ test_that("production requires growth to be a data frame without growth bootstra
       sample = data.frame(),
       biomass = data.frame(),
       growth = list(),
-      class.type = "size",
+      class.type = "length",
       class.size = 5
     ),
     "When not bootstrapping growth rates"
@@ -99,7 +99,7 @@ test_that("production validates bootstrap iterations", {
       sample = data.frame(),
       biomass = data.frame(),
       growth = data.frame(),
-      class.type = "size",
+      class.type = "length",
       class.size = 5,
       bio.boot = TRUE
     ),
@@ -112,7 +112,7 @@ test_that("production validates bootstrap iterations", {
       sample = data.frame(),
       biomass = data.frame(),
       growth = array(1:8, dim = c(2, 2, 2)),
-      class.type = "size",
+      class.type = "length",
       class.size = 5,
       growth.boot = TRUE
     ),
@@ -128,7 +128,7 @@ test_that("growth bootstrapping requires a three-dimensional array", {
       sample = data.frame(),
       biomass = data.frame(),
       growth = data.frame(),
-      class.type = "size",
+      class.type = "length",
       class.size = 5,
       growth.boot = TRUE,
       iter = 10
@@ -145,7 +145,7 @@ test_that("iter is ignored when bootstrapping is disabled", {
       sample = sample_data,
       biomass = biomass_data,
       growth = growth_data,
-      class.type = "size",
+      class.type = "length",
       class.size = 5,
       iter = 10
     ),
@@ -175,7 +175,7 @@ test_that("production requires iter to be a positive integer when bootstrapping"
         sample = sample_data,
         biomass = biomass_data,
         growth = growth_data,
-        class.type = "size",
+        class.type = "length",
         class.size = 5,
         bio.boot = TRUE,
         iter = invalid_iter[[i]]
@@ -199,7 +199,7 @@ test_that("production assumes area of one when area is missing", {
       sample = sample_no_area,
       biomass = biomass_data,
       growth = growth_data,
-      class.type = "size",
+      class.type = "length",
       class.size = 5
     ),
     "No vaule for 'area' provided"
@@ -216,7 +216,7 @@ test_that("production does not warn when area is provided", {
       sample = sample_data,
       biomass = biomass_data,
       growth = growth_data,
-      class.type = "size",
+      class.type = "length",
       class.size = 5
     )
   )
@@ -232,7 +232,7 @@ test_that("production estimates IGR production correctly", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   )
 
@@ -257,7 +257,7 @@ test_that("production summarizes estimates by site and sampling event", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   )
 
@@ -298,7 +298,7 @@ test_that("production keeps estimates separated by site", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   )
 
@@ -322,7 +322,7 @@ test_that("production supports biomass bootstrapping", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     bio.boot = TRUE,
     iter = 10
@@ -353,7 +353,7 @@ test_that("production supports growth bootstrapping", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_array,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     growth.boot = TRUE,
     iter = 10
@@ -383,7 +383,7 @@ test_that("production supports simultaneous biomass and growth bootstrapping", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_array,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     bio.boot = TRUE,
     growth.boot = TRUE,
@@ -417,7 +417,7 @@ test_that("production returns raw bootstrap estimates when requested", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     bio.boot = TRUE,
     iter = 10,
@@ -446,7 +446,7 @@ test_that("production returns raw estimates without bootstrapping", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     return.raw = TRUE
   )
@@ -470,7 +470,7 @@ test_that("parallel and sequential production estimates are equivalent", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     parallel = FALSE
   )
@@ -480,7 +480,7 @@ test_that("parallel and sequential production estimates are equivalent", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5,
     parallel = TRUE,
     mc.cores = 2
@@ -524,7 +524,7 @@ test_that("production handles sampling events with no biomass observations", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   )
 
@@ -563,7 +563,7 @@ test_that("production handles missing biomass observations within a sample", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   )
 
@@ -605,7 +605,7 @@ test_that("production does not convert missing growth estimates to zero", {
     sample = sample_data,
     biomass = biomass_data,
     growth = growth_data,
-    class.type = "size",
+    class.type = "length",
     class.size = 5
   ))
 

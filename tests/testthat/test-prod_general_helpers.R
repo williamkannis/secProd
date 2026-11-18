@@ -144,7 +144,7 @@ test_that("NA group_id warnings sound", {
       ),
       "sample"
     ),
-    'NA values present for "group_id" in "sample". These values wont be assinged a growth rate and will result in NA production estimate.'
+    'NA values present for "group_id" in "sample". These values will not be assigned a growth rate and will result in NA production estimate.'
   )
 
 })
@@ -396,7 +396,6 @@ test_that("NA warnings sound", {
 # class_df  --------------------------------------------------------------------
 test_that("class_df contains all columns", {
   input <- data.frame(
-    group_id = 1,
     length = 1,
     class = 1
   )
@@ -406,63 +405,17 @@ test_that("class_df contains all columns", {
     colnames(df)[x] <- "a"
     expect_error(
       .check_input_data(df,"class_df"),
-      '"class_df" must contain columns "group_id", "length", and "class"'
+      '"class_df" must contain columns "length" and "class"'
     )
   })
 })
 
-test_that("class_df does not contain duplicated data", {
-  expect_error(
-    .check_input_data(
-      data.frame(
-        group_id = c(1,2,2),
-        length = 1,
-        class = 1),
-      "class_df"
-      ),
-    '"class_df" contains duplicated entries'
-  )
-
-  expect_error(
-    .check_input_data(
-      data.frame(
-        group_id = 1,
-        length = c(1,2,2),
-        class = 1),
-      "class_df"
-    ),
-    '"class_df" contains duplicated entries'
-  )
-
-  expect_error(
-    .check_input_data(
-      data.frame(
-        group_id = 1,
-        length = 1,
-        class = c(1,2)),
-      "class_df"
-    ),
-    '"class_df" contains duplicated entries'
-  )
-
-})
 
 test_that("class_df does not contain any NA data", {
-  expect_error(
-    .check_input_data(
-      data.frame(
-        group_id = NA,
-        length = 1,
-        class = 1),
-      "class_df"
-    ),
-    "'class_df contains NA values for atleast one column"
-  )
 
   expect_error(
     .check_input_data(
       data.frame(
-        group_id = 1,
         length = 1,
         class = NA),
       "class_df"
@@ -473,7 +426,6 @@ test_that("class_df does not contain any NA data", {
   expect_error(
     .check_input_data(
       data.frame(
-        group_id = 1,
         length = NA,
         class = 1),
       "class_df"
@@ -487,74 +439,32 @@ test_that("class_df does not contain any NA data", {
 # .class_fun  ==================================================================
 
 # Input validation  ------------------------------------------------------------
-test_that("class.type must be age or size", {
+test_that("class.type must be age or length", {
   expect_error(
-    .class_fun(input, "length", 5),
-    'class.type must be "age" or "size"'
+    .class_fun(3, "siz", 5),
+    'class.type must be "age" or "length"'
   )
 })
 
-test_that("input must contain required columns", {
-  expect_error(
-    .class_fun(data.frame(length = 10), "size", 5),
-    'input must contain columns "group_id" and "length"'
-  )
-
-  expect_error(
-    .class_fun(data.frame(group_id = 1), "size", 5),
-    'input must contain columns "group_id" and "length"'
-  )
-
-  expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "age", 5),
-    'input must contain column "age_pred"'
-  )
-
-})
-
-test_that("input must contain required columns", {
-  expect_error(
-    .class_fun(data.frame(length = 10), "size", 5),
-    'input must contain columns "group_id" and "length"'
-  )
-
-  expect_error(
-    .class_fun(data.frame(group_id = 1), "size", 5),
-    'input must contain columns "group_id" and "length"'
-  )
-
-  expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "age", 5),
-    'input must contain column "age_pred"'
-  )
-
-})
-
-test_that("class.type must be age or size", {
-  expect_error(
-    .class_fun(input, "length", 5),
-    'class.type must be "age" or "size"'
-  )
-})
 
 test_that("class.size must be postive integer", {
   expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "size", .5),
+    .class_fun(4, "length", .5),
     "class.size must be postive interger"
   )
 
   expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "size", -.5),
+    .class_fun(4, "length", -.5),
     "class.size must be postive interger"
   )
 
   expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "size", -5),
+    .class_fun(4, "length", -5),
     "class.size must be postive interger"
   )
 
   expect_error(
-    .class_fun(data.frame(group_id = 1, length = 4), "size", 0),
+    .class_fun(4, "length", 0),
     "class.size must be postive interger"
   )
 })
@@ -563,12 +473,9 @@ test_that("class.size must be postive integer", {
 # Class assignment  ------------------------------------------------------------
 test_that("size classes are assigned correctly", {
 
-  input <- data.frame(
-    group_id = 1,
-    length = c(2, 5, 9, 10, 15, 20)
-  )
+  input <- c(2, 5, 9, 10, 15, 20)
 
-  result <- .class_fun(input, "size", 5)
+  result <- .class_fun(input, "length", 5)
 
   expect_equal(
     result$class,
@@ -578,11 +485,7 @@ test_that("size classes are assigned correctly", {
 
 test_that("age classes are assigned correctly", {
 
-  input <- data.frame(
-    group_id = 1,
-    length = c(10, 15, 20, 25),
-    age_pred = c(0, 1, 2, 3)
-  )
+  input <- c(0, 1, 2, 3)
 
   result <- .class_fun(input, "age", 2)
 
@@ -594,123 +497,50 @@ test_that("age classes are assigned correctly", {
 
 test_that("observations on class boundaries are assigned correctly", {
 
-  input <- data.frame(
-    group_id = 1,
-    length = c(5, 10, 15)
-  )
+  input <- c(5, 10, 15)
 
-  result <- .class_fun(input, "size", 5)
+  result <- .class_fun(input, "length", 5)
 
   expect_equal(result$class, c(1, 2, 3))
 })
 
 test_that("Classes defined by NA lengths are removed", {
 
-  input1 <- data.frame(
-    group_id = 1,
-    length = c(5, 10, 15,NA)
-  )
-
-  input2 <- data.frame(
-    group_id = 1,
-    length = c(5, 10, 15,30),
-    age_pred = c(2,NA,4,6)
-  )
+  input1 <- c(5, 10, 15,NA)
+  input2 <- c(2,NA,4,6)
 
   expect_warning(
-    result1 <- .class_fun(input1, "size", 5),
-    'NA values present for "length", resulting size classes will be ignored'
+    result1 <- .class_fun(input1, "length", 5),
+    'NA values present for "input", resulting size classes will be ignored'
     )
   expect_equal(result1$class, c(1, 2, 3))
   expect_equal(result1$length, c(5, 10, 15))
 
   expect_warning(
     result2 <- .class_fun(input2, "age", 2),
-    'NA values present for "age_pred", resulting age classes will be ignored'
+    'NA values present for "input", resulting size classes will be ignored'
   )
   expect_equal(result2$class, c(1, 2, 3))
-  expect_equal(result2$length, c(5, 15, 30))
+  expect_equal(result2$age, c(2, 4, 6))
 
   expect_error(
-    .class_fun(data.frame(
-      length = c(NA, NA),
-      group_id = 1
-    ),
-    "size",
-    5
-    ),
-    'No values present for "length"'
+    .class_fun(c(NA, NA),"length",5),
+    'No values present for "input"'
   )
 
   expect_error(
-    .class_fun(data.frame(
-      length = c(4, 5),
-      age_pred = c(NA,NA),
-      group_id = 1
-    ),
-    "age",
-    5
-    ),
-    'No values present for "age_pred"'
+    .class_fun(c(NA, NA),"age",5),
+    'No values present for "input"'
   )
 
 })
 
-# Groups have the same age classes  --------------------------------------------
-test_that("identical classes across groups are accepted", {
 
-  input <- data.frame(
-    group_id = rep(1:2, each = 3),
-    length = rep(c(5, 10, 15), 2)
-  )
+test_that("duplicate class length combinations are removed", {
 
-  expect_no_error(
-    .class_fun(input, "size", 5)
-  )
-})
+  input <- c(5, 5, 10, 10)
 
-test_that("groups with different lengths but identical classes are accepted", {
-
-  input <- data.frame(
-    group_id = c(1, 1, 1, 2, 2, 2),
-    length = c(5, 10, 15, 6, 11, 16)
-  )
-
-  result <- .class_fun(input, "size", 5)
-
-  expect_no_error(
-    .class_fun(input, "size", 5)
-  )
-
-  expect_equal(
-    sort(unique(result$class)),
-    1:3
-  )
-})
-
-test_that("different classes across groups produce an error", {
-
-  input <- data.frame(
-    group_id = c(1, 1, 1, 2, 2),
-    length = c(5, 10, 15, 5, 10)
-  )
-
-  expect_error(
-    .class_fun(input, "size", 5),
-    "Growth groups do not have the same size/age classes"
-  )
-})
-
-
-# Duplicate observations  ------------------------------------------------------
-test_that("duplicate group length combinations are removed", {
-
-  input <- data.frame(
-    group_id = c(1, 1, 1, 1),
-    length = c(5, 5, 10, 10)
-  )
-
-  result <- .class_fun(input, "size", 5)
+  result <- .class_fun(input, "length", 5)
 
   expect_equal(nrow(result), 2)
 
@@ -720,18 +550,27 @@ test_that("duplicate group length combinations are removed", {
   )
 })
 
-test_that("output contains group_id, length, and class", {
+test_that("output contains length, and class", {
 
-  input <- data.frame(
-    group_id = 1,
-    length = c(5, 10, 15)
-  )
+  input <- c(5, 10, 15)
 
-  result <- .class_fun(input, "size", 5)
+  result <- .class_fun(input, "length", 5)
 
   expect_named(
     result,
-    c("group_id", "length", "class")
+    c("length", "class")
+  )
+})
+
+test_that("output contains age, and class", {
+
+  input <- c(5, 10, 15)
+
+  result <- .class_fun(input, "age", 5)
+
+  expect_named(
+    result,
+    c("age", "class")
   )
 })
 
@@ -749,7 +588,6 @@ test_that("class biomass summary calculates correct values", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 10, 15),
     class = c(1, 2, 3)
   )
@@ -780,7 +618,6 @@ test_that("missing biomass observations produce zero mean mass", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 10),
     class = c(1, 2)
   )
@@ -792,12 +629,48 @@ test_that("missing biomass observations produce zero mean mass", {
     wt = 2
   )
 
-  result <- .class_bio_sum(sample, class_df, biomass)
+  expect_no_warning(result <- .class_bio_sum(sample, class_df, biomass))
 
   expect_equal(result$mean_mass[result$class == 1], 2)
   expect_equal(result$mean_mass[result$class == 2], 0)
   expect_equal(result$n[result$class == 1], 1)
   expect_equal(result$n[result$class == 2], 0)
+})
+
+test_that("missing sites from biomass produce zero mean mass", {
+
+  sample <- data.frame(
+    site = 1,
+    cum = c(1,2),
+    interval = 1,
+    area = 10,
+    group_id = 1
+  )
+
+  class_df <- data.frame(
+    length = c(5, 10),
+    class = c(1, 2)
+  )
+
+  biomass <- data.frame(
+    site = 1,
+    cum = 1,
+    length = c(5,10),
+    wt = c(2,3)
+  )
+
+  expect_no_warning(result <- .class_bio_sum(sample, class_df, biomass))
+
+  expect_equal(result$mean_mass[result$class == 1 & result$cum == 1], 2)
+  expect_equal(result$mean_mass[result$class == 1 & result$cum == 2], 0)
+  expect_equal(result$mean_mass[result$class == 2 & result$cum == 1], 3)
+  expect_equal(result$mean_mass[result$class == 2 & result$cum == 2], 0)
+
+  expect_equal(result$n[result$class == 1 & result$cum == 1], 1)
+  expect_equal(result$n[result$class == 1 & result$cum == 2], 0)
+  expect_equal(result$n[result$class == 2 & result$cum == 1], 1)
+  expect_equal(result$n[result$class == 2 & result$cum == 2], 0)
+
 })
 
 test_that("NA wt values do not affect mean mass", {
@@ -811,7 +684,6 @@ test_that("NA wt values do not affect mean mass", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 10),
     class = c(1, 2)
   )
@@ -835,9 +707,9 @@ test_that("NA wt values do not affect mean mass", {
 })
 
 
-test_that("missing length, cum, and site values are removed before grouping", {
+test_that("NA length, cum, and site values are removed before grouping", {
 
-  sample <- data.frame(
+   sample <- data.frame(
     site = c(1,1),
     cum = c(1,2),
     interval = c(1,1),
@@ -846,7 +718,6 @@ test_that("missing length, cum, and site values are removed before grouping", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 10),
     class = c(1, 2)
   )
@@ -876,19 +747,80 @@ test_that("missing length, cum, and site values are removed before grouping", {
 
   lapply(c("site","cum"), function(x) {
 
-    sample_na <- sample
-    sample_na[[x]][2] <- NA
+    sample_na <- rbind(sample,c(1,3,1,10,1))
+    sample_na[[x]][3] <- NA
     expect_warning(
       result <- .class_bio_sum(sample_na, class_df, biomass),
       'NA values present for "cum" and "site" in "sample". These groupings will be ignored'
     )
 
-    expect_equal(result$mean_mass, c(2,0))
-    expect_equal(result$n, c(1,0))
-    expect_equal(result$site, c(1,1))
-    expect_equal(result$cum, c(1,1))
+    expect_equal(result$mean_mass, c(2,0,0,13))
+    expect_equal(result$n, c(1,0,0,2))
+    expect_equal(result$site, c(1,1,1,1))
+    expect_equal(result$cum, c(1,1,2,2))
 
   })
+
+})
+
+test_that("class biomass summary ignores site/cums in biomass but not sample",{
+
+  sample <- data.frame(
+    site = 1,
+    cum = 1,
+    interval = 1,
+    area = 10,
+    group_id = 1
+  )
+
+  class_df <- data.frame(
+    length = c(5, 6, 7),
+    class = c(1, 1, 1)
+  )
+
+  biomass <- data.frame(
+    site = c(1,1,1,2),
+    cum = 1,
+    length = c(5, 6, 7,7),
+    wt = c(2, 4, 6,10)
+  )
+
+  expect_warning(
+    result <- .class_bio_sum(sample, class_df, biomass),
+    'Some site and cum values from "biomass" are missing from "sample". This will prevent biomass data to be assigned an age class or growth rate, and will be removed'
+    )
+
+  expect_equal(result$mean_mass, 4)
+  expect_equal(result$n, 3)
+
+})
+
+test_that("class biomass summary fails if class_id is missing lengths from biomass", {
+
+  sample <- data.frame(
+    site = 1,
+    cum = 1,
+    interval = 1,
+    area = 10,
+    group_id = 1
+  )
+
+  class_df <- data.frame(
+    length = c(5, 6, 7),
+    class = c(1, 1, 1)
+  )
+
+  biomass <- data.frame(
+    site = 1,
+    cum = 1,
+    length = c(5, 6, 7,8),
+    wt = c(2, 4, 6,10)
+  )
+
+  expect_error(
+    result <- .class_bio_sum(sample, class_df, biomass),
+    '"class_id" does not contain all lengths in "biomass'
+  )
 
 })
 
@@ -903,7 +835,6 @@ test_that("class biomass summary calculates mean mass across individuals", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 6, 7),
     class = c(1, 1, 1)
   )
@@ -921,65 +852,7 @@ test_that("class biomass summary calculates mean mass across individuals", {
   expect_equal(result$n, 3)
 })
 
-test_that("class biomass summary fails if group ids are missing from class_df",{
 
-  sample <- data.frame(
-    site = 1,
-    cum = c(1,2,3),
-    interval = 1,
-    area = 10,
-    group_id = c(1,2,3)
-  )
-
-  class_df <- data.frame(
-    group_id = 1,
-    length = c(5, 6, 7),
-    class = c(1, 1, 1)
-  )
-
-  biomass <- data.frame(
-    site = 1,
-    cum = c(1,2,3),
-    length = c(5, 6, 7),
-    wt = c(2, 4, 6)
-  )
-
-  expect_error(
-    .class_bio_sum(sample,class_df,biomass),
-    '"growth" does not contain all values of "group_id" in "sample"'
-  )
-
-})
-
-test_that("class biomass summary warns if group ids are missing from sample",{
-
-  sample <- data.frame(
-    site = 1,
-    cum = c(1,2,3),
-    interval = 1,
-    area = 10,
-    group_id = 1
-  )
-
-  class_df <- data.frame(
-    group_id = c(1,2,3),
-    length = c(5, 6, 7),
-    class = c(1, 1, 1)
-  )
-
-  biomass <- data.frame(
-    site = 1,
-    cum = c(1,2,3),
-    length = c(5, 6, 7),
-    wt = c(2, 4, 6)
-  )
-
-  expect_warning(
-    .class_bio_sum(sample,class_df,biomass),
-    'Some "group_ids" from "growth" are not present in "sample". These will be ignored.'
-  )
-
-})
 
 
 # .class_growth_sum  ==========================================================
@@ -993,7 +866,6 @@ test_that("class growth summary calculates mean growth correctly", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = c(5, 6, 7, 10, 11),
     class = c(1, 1, 1, 2, 2)
   )
@@ -1016,9 +888,8 @@ test_that("class growth summary preserves groups and intervals", {
   )
 
   class_df <- data.frame(
-    group_id = c(1, 1, 2, 2),
-    length = c(5, 10, 5, 10),
-    class = c(1, 2, 1, 2)
+    length = c(5,10),
+    class = c(1,2)
   )
 
   result <- .class_growth_sum(growth, class_df)
@@ -1030,31 +901,8 @@ test_that("class growth summary preserves groups and intervals", {
   )
 })
 
-test_that("class growth summary retains classes without growth observations", {
 
-  growth <- data.frame(
-    group_id = 1,
-    length = 5,
-    interval = 1,
-    interval_growth_pred = 2
-  )
-
-  class_df <- data.frame(
-    group_id = 1,
-    length = c(5, 10),
-    class = c(1, 2)
-  )
-
-  expect_warning(
-    result <- .class_growth_sum(growth, class_df),
-    "Some size classes are missing growth rates. NA production will be returned"
-    )
-
-  expect_equal(nrow(result), 2)
-  expect_true(any(is.na(result$mean_growth)))
-})
-
-test_that("NA length or group IDS are removed", {
+test_that("NA length are removed", {
   growth <- data.frame(
     group_id = 1,
     length = c(5,5,5),
@@ -1063,7 +911,6 @@ test_that("NA length or group IDS are removed", {
   )
 
   class_df <- data.frame(
-    group_id = 1,
     length = 5,
     class = 1
   )
@@ -1087,31 +934,23 @@ test_that("NA length or group IDS are removed", {
   })
 })
 
-test_that("growth summary fails if growth groupins are missing from class_df",{
+test_that("growth summary warns if lengths are missing from class_df",{
   growth <- data.frame(
     group_id = c(1,2,3),
-    length = c(5,6,7),
+    length = c(5,6,10),
     interval = 1,
     interval_growth_pred = 1
   )
 
   class_df <- data.frame(
-    group_id = c(1,2,3),
     length = c(5,6,7),
     class = 1
   )
 
-  lapply(c("group_id","length"), function(x){
-    class_wrong <- class_df
-    class_wrong[[x]][3] <- 10
-
-    expect_error(
-      .class_growth_sum(growth, class_wrong),
-      'Some values for "group_id" and "length" from "growth are missing from "class_df"'
-
-    )
-  })
-
+  expect_error(
+    result <- .class_growth_sum(growth, class_df),
+    'Some values for "length" from "growth" are missing from "class_df"'
+  )
 
 })
 
@@ -1180,6 +1019,7 @@ test_that("class IGR calculates production independently by site and class", {
 
 
 # .prod_sum  ===================================================================
+
 test_that("production summary aggregates across classes", {
 
   input <- data.frame(
@@ -1256,3 +1096,205 @@ test_that("production summary does not convert missing values to zero", {
 #   expect_true(is.na(result$PtoB))
 # })
 # WHAT TO DO IF NA IS PRESENT IN ONE CLASS BUT NOT OTHERS (MISSING LENGTH DATA)
+
+# # OLD .size_class tests
+# # .class_fun  ==================================================================
+#
+# # Input validation  ------------------------------------------------------------
+# test_that("class.type must be age or size", {
+#   expect_error(
+#     .class_fun(input, "length", 5),
+#     'class.type must be "age" or "size"'
+#   )
+# })
+#
+# test_that("input must contain required columns", {
+#   # expect_error(
+#   #   .class_fun(data.frame(length = 10), "size", 5),
+#   #   'input must contain columns "group_id" and "length"'
+#   # )
+#
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1), "size", 5),
+#     'input must contain columns "length"'
+#   )
+#
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1, length = 4), "age", 5),
+#     'input must contain column "age_pred"'
+#   )
+#
+# })
+#
+#
+# test_that("class.type must be age or size", {
+#   expect_error(
+#     .class_fun(input, "length", 5),
+#     'class.type must be "age" or "size"'
+#   )
+# })
+#
+# test_that("class.size must be postive integer", {
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1, length = 4), "size", .5),
+#     "class.size must be postive interger"
+#   )
+#
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1, length = 4), "size", -.5),
+#     "class.size must be postive interger"
+#   )
+#
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1, length = 4), "size", -5),
+#     "class.size must be postive interger"
+#   )
+#
+#   expect_error(
+#     .class_fun(data.frame(group_id = 1, length = 4), "size", 0),
+#     "class.size must be postive interger"
+#   )
+# })
+#
+#
+# # Class assignment  ------------------------------------------------------------
+# test_that("size classes are assigned correctly", {
+#
+#   input <- data.frame(
+#     # group_id = 1,
+#     length = c(2, 5, 9, 10, 15, 20)
+#   )
+#
+#   result <- .class_fun(input, "size", 5)
+#
+#   expect_equal(
+#     result$class,
+#     c(0, 1, 1, 2, 3, 4)
+#   )
+# })
+#
+# test_that("age classes are assigned correctly", {
+#
+#   input <- data.frame(
+#     # group_id = 1,
+#     length = c(10, 15, 20, 25),
+#     age_pred = c(0, 1, 2, 3)
+#   )
+#
+#   result <- .class_fun(input, "age", 2)
+#
+#   expect_equal(
+#     result$class,
+#     c(0, 0, 1, 1)
+#   )
+# })
+#
+# test_that("observations on class boundaries are assigned correctly", {
+#
+#   input <- data.frame(
+#     # group_id = 1,
+#     length = c(5, 10, 15)
+#   )
+#
+#   result <- .class_fun(input, "size", 5)
+#
+#   expect_equal(result$class, c(1, 2, 3))
+# })
+#
+# test_that("Classes defined by NA lengths are removed", {
+#
+#   input1 <- data.frame(
+#     # group_id = 1,
+#     length = c(5, 10, 15,NA)
+#   )
+#
+#   input2 <- data.frame(
+#     # group_id = 1,
+#     length = c(5, 10, 15,30),
+#     age_pred = c(2,NA,4,6)
+#   )
+#
+#   expect_warning(
+#     result1 <- .class_fun(input1, "size", 5),
+#     'NA values present for "length", resulting size classes will be ignored'
+#   )
+#   expect_equal(result1$class, c(1, 2, 3))
+#   expect_equal(result1$length, c(5, 10, 15))
+#
+#   expect_warning(
+#     result2 <- .class_fun(input2, "age", 2),
+#     'NA values present for "age_pred", resulting age classes will be ignored'
+#   )
+#   expect_equal(result2$class, c(1, 2, 3))
+#   expect_equal(result2$length, c(5, 15, 30))
+#
+#   expect_error(
+#     .class_fun(data.frame(
+#       length = c(NA, NA),
+#       group_id = 1
+#     ),
+#     "size",
+#     5
+#     ),
+#     'No values present for "length"'
+#   )
+#
+#   expect_error(
+#     .class_fun(data.frame(
+#       length = c(4, 5),
+#       age_pred = c(NA,NA),
+#       group_id = 1
+#     ),
+#     "age",
+#     5
+#     ),
+#     'No values present for "age_pred"'
+#   )
+#
+# })
+#
+# # REMOVE - NO LONGER RELEVANT WITHOUT GORUP_ID
+# # Groups have the same age classes  --------------------------------------------
+# # test_that("identical classes across groups are accepted", {
+# #
+# #   input <- data.frame(
+# #     group_id = rep(1:2, each = 3),
+# #     length = rep(c(5, 10, 15), 2)
+# #   )
+# #
+# #   expect_no_error(
+# #     .class_fun(input, "size", 5)
+# #   )
+# # })
+# #
+# # test_that("groups with different lengths but identical classes are accepted", {
+# #
+# #   input <- data.frame(
+# #     group_id = c(1, 1, 1, 2, 2, 2),
+# #     length = c(5, 10, 15, 6, 11, 16)
+# #   )
+# #
+# #   result <- .class_fun(input, "size", 5)
+# #
+# #   expect_no_error(
+# #     .class_fun(input, "size", 5)
+# #   )
+# #
+# #   expect_equal(
+# #     sort(unique(result$class)),
+# #     1:3
+# #   )
+# # })
+# #
+# # test_that("different classes across groups produce an error", {
+# #
+# #   input <- data.frame(
+# #     group_id = c(1, 1, 1, 2, 2),
+# #     length = c(5, 10, 15, 5, 10)
+# #   )
+# #
+# #   expect_error(
+# #     .class_fun(input, "size", 5),
+# #     "Growth groups do not have the same size/age classes"
+# #   )
+# # })
