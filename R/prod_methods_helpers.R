@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 
 # Instantaneous growth rate method
-.igr <- function(growth,biomass,sample,class.type,class.size) {
+.igr <- function(growth,biomass,sample,class.type,class.size, sp.name = NULL) {
 
   # Create age classes
   if(!class.type %in% colnames(biomass)){
@@ -47,7 +47,16 @@
   prod_sc <- .class_igr(input)
 
   # Summarize
-  .prod_sum(prod_sc)
+  out <-.prod_sum(prod_sc)
+
+  # Add species name if specified - EVENTUAL MAKE THIS A GROUPING TO SUPPORT MULTIPLE SPECIES AT ONCE
+  if(!is.null(sp.name)) {
+    if(length(sp.name) > 1){
+      stop('more than one value for sp.name provided')
+    }
+    out$species <- sp.name
+  }
+  out
 
 }
 

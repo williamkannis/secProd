@@ -29,6 +29,7 @@
 #' @export
 
 production <- function(
+    sp.name = NULL,
     method,
     sample,
     biomass,
@@ -109,6 +110,10 @@ production <- function(
   }
 
   # Assess sample data
+  if(!is.null(sp.name) & length(sp.name) > 1){
+    stop('Please only provide one value for "sp.name".')
+  }
+
   if(is.null(sample$area)) {
     sample$area = 1
     warning(paste0(
@@ -134,7 +139,8 @@ production <- function(
       biomass = biomass,
       growth = growth,
       class.type = class.type,
-      class.size = class.size
+      class.size = class.size,
+      sp.name = sp.name
     )
 
     # Bootstrap data as indicated
@@ -152,7 +158,12 @@ production <- function(
 
   # summarize bootstrapping results where applicable
   if(boot) {
-    prod <- .boot_summary(prod_list,group.var = c("site","cum"))
+
+    group.var = c("site","cum")
+
+    if(!is.null(sp.name)) group.var <- c(group.var,"species")
+
+    prod <- .boot_summary(prod_list,group.var = group.var)
   } else {
     prod <- prod_list[[1]]
   }

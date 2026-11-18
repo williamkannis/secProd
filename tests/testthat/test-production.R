@@ -44,6 +44,21 @@ biomass_data <- data.frame(
 
 # Method and input validation  -------------------------------------------------
 
+test_that("production only accepts a single value for species name",{
+  expect_error(
+    production(
+      method = "igr",
+      sp.name <- c(1:3),
+      sample = data.frame(),
+      biomass = data.frame(),
+      growth = data.frame(),
+      class.type = "length",
+      class.size = 5
+    ),
+    'Please only provide one value for "sp.name".'
+  )
+})
+
 test_that("production validates method", {
 
   expect_error(
@@ -233,7 +248,8 @@ test_that("production estimates IGR production correctly", {
     biomass = biomass_data,
     growth = growth_data,
     class.type = "length",
-    class.size = 5
+    class.size = 5,
+    sp.name = "test"
   )
 
   expect_s3_class(result, "data.frame")
@@ -244,7 +260,8 @@ test_that("production estimates IGR production correctly", {
     "site",
     "cum",
     "production",
-    "PtoB"
+    "PtoB",
+    "species"
   ) %in% names(result)))
 
   expect_equal(result$production[1], 1.7)
@@ -325,7 +342,8 @@ test_that("production supports biomass bootstrapping", {
     class.type = "length",
     class.size = 5,
     bio.boot = TRUE,
-    iter = 10
+    iter = 10,
+    sp.name = "test"
   )
 
   expect_s3_class(result, "data.frame")
@@ -341,8 +359,10 @@ test_that("production supports biomass bootstrapping", {
     "production_",
     names(result)
   )))
-})
 
+  expect_all_true(result$species == "test")
+
+})
 
 test_that("production supports growth bootstrapping", {
 

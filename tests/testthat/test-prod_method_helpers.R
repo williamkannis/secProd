@@ -1,5 +1,7 @@
 # .igr  ========================================================================
 
+# Input validation  ------------------------------------------------------------
+
 test_that("IGR fails if growth or biomass are missing column used in size class",{
 
   growth <- data.frame(
@@ -109,6 +111,67 @@ test_that('IGR warns that lengths from biomass are missing in length',{
 
 })
 
+
+# Result validiation  ----------------------------------------------------------
+
+test_that("IGR assigns species name if given", {
+
+  growth <- data.frame(
+    group_id = 1,
+    length = c(5, 10),
+    interval = 1,
+    interval_growth_pred = c(1, 2)
+  )
+
+  sample <- data.frame(
+    site = 1,
+    cum = c(1, 2),
+    interval = 1,
+    area = 10,
+    group_id = 1
+  )
+
+  biomass <- data.frame(
+    site = c(1, 1, 1, 1),
+    cum = c(1, 1, 2, 2),
+    length = c(5, 10, 5, 10),
+    wt = c(2, 6, 4, 8)
+  )
+
+  result <- .igr(
+    growth = growth,
+    biomass = biomass,
+    sample = sample,
+    class.type = "length",
+    class.size = 5,
+    sp.name = "test"
+  )
+  expect_all_true(result$species == "test")
+
+  result2 <- .igr(
+    growth = growth,
+    biomass = biomass,
+    sample = sample,
+    class.type = "length",
+    class.size = 5
+  )
+
+  expect_all_true(colnames(result2) != "species")
+
+  expect_error(
+    .igr(
+      growth = growth,
+      biomass = biomass,
+      sample = sample,
+      class.type = "length",
+      class.size = 5,
+      sp.name = c("test1","test2")
+    ),
+    'more than one value for sp.name provided'
+  )
+
+
+})
 
 test_that("IGR estimates class-specific production correctly", {
 
@@ -231,6 +294,9 @@ test_that('IGR treats missing site/cum in biomass as zero', {
   expect_equal(result$PtoB, c(1.75,1.666666667,NA))
 
 })
+
+
+# NA data handling  ------------------------------------------------------------
 
 test_that('IGR removes NA groupings from estimates',{
 
