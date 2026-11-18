@@ -376,7 +376,8 @@ test_that("production supports growth bootstrapping", {
     class.type = "length",
     class.size = 5,
     growth.boot = TRUE,
-    iter = 10
+    iter = 10,
+    sp.name = "test"
   )
 
   expect_s3_class(result, "data.frame")
@@ -392,6 +393,9 @@ test_that("production supports growth bootstrapping", {
     "production_",
     names(result)
   )))
+
+  expect_all_true(result$species == "test")
+
 })
 
 test_that("production supports simultaneous biomass and growth bootstrapping", {
